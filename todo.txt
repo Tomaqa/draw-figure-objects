@@ -1,0 +1,7 @@
+* GD JS:
+   * smart_dict - podle nejake konvence sestavit cely dict jen podle poradi a pozic poli
+   * pokusit se o to, aby se cela cast ke kopirovani vygenerovala automaticky jednou funkci jen na zaklade poli k jedn. layoutum
+
+* nefunguji CFigObject jako skupiny pro objekty zarovnane doprava s pozitivnim offsetem nebo s velkou sirkou - proste kdyz to presahuje ramec ostatnich objektu - mel by se aktualizovat xoffsm (resp. RelBegin) a Size
+* umoznit deep mirror - zrcadlit objekt vcetne jeho podobjektu
+* zmena poradi objektu po vlozeni (jen pro vykresleni)
