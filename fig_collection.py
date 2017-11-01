@@ -6,15 +6,16 @@
 from __future__ import division
 import copy as cp
 
-import fig_object as fo
-import figure as fig
-
 import sys
 import logging as log
 
+log.basicConfig(stream=sys.stdout, level=log.WARNING)
+
+import fig_object as fo
+import figure as fig
+
 import csv
 
-log.basicConfig(stream=sys.stdout, level=log.WARNING)
 
 
 ################################################################################
@@ -267,21 +268,20 @@ class CFigCollection(object):
       for idx in range(count):
          self.AddFigure()
 ########################################
-   def DoAll(self, rank_step=None, layout_step=None, force_draw=False):
+   def DoFigures(self, rank_step=None, layout_step=None, force_draw=False):
       ret = False
       start = self.FiguresPos+1
       end = self.FiguresCount
-      # for fig in self.figures:
       for fig in self.figures[start:end]:
          print "Processing %d. figure%s ..." % (fig.idx+1, "" if not fig.name else " '"+fig.name+"'")
          ret |= fig.Do(rank_step=rank_step, layout_step=layout_step, force_draw=force_draw)
       self.figures_pos = end-1
       return ret
    
-   def LoadAndDoAll(self, src, rank_step=None, layout_step=None, force_draw=False, **load_args):
+   def LoadAndDoFigures(self, src, rank_step=None, layout_step=None, force_draw=False, **load_args):
       self.LoadFiguresAttrs(src, **load_args)
       self.AddAllFigures()
-      return self.DoAll()
+      return self.DoFigures(rank_step=rank_step, layout_step=layout_step, force_draw=force_draw)
 ################################################################################
 
 
@@ -361,16 +361,3 @@ if __name__ == "__main__":
       print
 
    print "\n<</CFigCollection tests>>"
-
-# 'class' : {
-#    'thrall' : {
-#       'class_importance_draw_object_args' : {
-#          'effect_fill': {'path' : "/home/tomaqa/Data/Pics/Hry/Mysteria/Karty/v1.10/thrall.gif"},
-#       },
-#    },
-#    'mages' : {
-#       'class_importance_draw_object_args' : {
-#          'effect_fill': {'path' : "/home/tomaqa/Data/Pics/Hry/Mysteria/Karty/v1.10/mages.gif"},
-#       },
-#    },
-# },

@@ -204,7 +204,7 @@ class CLayoutMysteriaCardPlay_(CLayoutMysteriaCardHold_):
       },
 
       'force_play' : False,
-      'back_force_play_width_mm' : 11,
+      'back_force_play_width_mm' : 9,
       'back_force_play_height_mm' : 22,
       'back_force_play_xalign' : 'center',
       'back_force_play_yloc' : 'below',

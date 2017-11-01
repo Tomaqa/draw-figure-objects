@@ -6,14 +6,17 @@ from __future__ import division
 from gimpfu import *
 
 import copy as cp
+import os.path
+
 import logging as log
 import sys
-import os.path
+
+log.basicConfig(stream=sys.stdout, level=log.INFO)
+
 
 import fig_object as fo
 import figure as fig
 
-log.basicConfig(stream=sys.stdout, level=log.INFO)
 
 ################################################################################
 class CDrawObjectGimp(fo.CDrawObjectBase):
@@ -44,6 +47,7 @@ class CDrawObjectGimp(fo.CDrawObjectBase):
 
    def CreateImage(self):
       img = gimp.Image(1, 1, RGB)
+      img.disable_undo()
       self.Resize(img)
       img.filename = "/home/tomaqa/Data/Pics/Hry/Mysteria/v1.10/Karty/gen/"+self.figure.IdxNamePrefix+self.key.title()+".xcf"
       return img
@@ -97,6 +101,7 @@ class CDrawObjectGimp(fo.CDrawObjectBase):
       log.debug("PreDrawObject: " + str(self.ptr) + " " + str(self.img) + " : " + str(self.img.layers))
       log.debug("  " + str(self.img.active_layer) + " >>> " + str(self.layer))
       self.Resize(self.layer)
+      log.debug(str(self.layer.width) + "x" + str(self.layer.height))
       self.img.active_layer = self.layer
 
    def PostDrawObject(self):
@@ -106,7 +111,6 @@ class CDrawObjectGimp(fo.CDrawObjectBase):
 
    def PostDrawRootObject(self):
       self.Save()
-      self.img.clean_all()
       gimp.delete(self.img)
 ########################################
    ## Scale layer to fit figure object

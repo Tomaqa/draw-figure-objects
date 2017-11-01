@@ -10,6 +10,7 @@ from functools import reduce  ## forward compatibility for Python 3
 
 import copy as cp
 import inspect
+
 import sys
 import logging as log
 
@@ -76,13 +77,13 @@ def merge_2dicts_rec(dict1, dict2):
 ## Inputs don't have to be dictionaries
 ## but can be also single values
 def merge_dicts(*dicts):
-   log.debug("MERGE inputs:")
+   log.log(1, "MERGE inputs:")
    for d in dicts:
-      log.debug(str(d))
+      log.log(1, str(d))
    d0 = dicts[0]
    for d in dicts[1:]:
       d0 = merge_2dicts_rec(d0,d)
-   log.debug("MERGE output: "+str(d0))
+   log.log(1, "MERGE output: "+str(d0))
    return d0
 
 def merge_lists(*lists):
@@ -678,6 +679,10 @@ class CFigObject(object):
       if draw_class != None:
          self.SetDrawByClass(draw_class, **draw_args)
 ########################################
+   ## It does not copy object's position!
+   ## To do this, one have to use 'SetPosFromObject'
+   ## (Sometimes one wants to use completely different position.)
+   ## Still, object's parent >is< copied, thus its position is eval'ed from it.
    def __copy__(self):
       obj = self.__class__(
          ## Key will be possibly incremented when inserting into parent object
@@ -686,10 +691,6 @@ class CFigObject(object):
          width_mm          = self.Width_mm,
          height_mm         = self.Height_mm,
          margin_mm         = self.Margin_mm,
-         xoffs_mm          = self.offs_mm[0],
-         yoffs_mm          = self.offs_mm[1],
-         xalign            = self.align[0],
-         yalign            = self.align[1],
          opacity           = self.Opacity,
          parent            = self.parent,
          figure            = self.figure,
@@ -701,7 +702,9 @@ class CFigObject(object):
    def __deepcopy__(self, memo):
       obj = self.__copy__()
       for subobj in self.objects_ordered:
-         obj.InsertObject(cp.deepcopy(subobj))
+         subcopy = cp.deepcopy(subobj)
+         subcopy.SetPosFromObject(subobj)
+         obj.InsertObject(subcopy)
       return obj
 ########################################
    def __str__(self):
@@ -743,7 +746,7 @@ class CFigObject(object):
    ## - values that correspond with 'self.align' possible values are absolute
    ## - 'None' value means to keep previous align
    def SetPosFromObject(self, object_, xloc='sameas', yloc='sameas', add_xoffs_mm=0, add_yoffs_mm=0):
-      rel_locs = [['sameas','leftof','rightof','centerof'],['sameas','above','below','centerof']]
+      rel_locs = [['leftof','rightof','centerof'],['above','below','centerof']]
       loc = [xloc, yloc]
       add_offs_mm = [add_xoffs_mm, add_yoffs_mm]
 
@@ -752,19 +755,19 @@ class CFigObject(object):
          if l == 'mirror':
             self.SetOppositeAlign(object_.align[idx], idx)
             object_offs_mult = -1
-         elif l in rel_locs[idx]:
+         elif l == 'sameas' or l in rel_locs[idx]:
             self.SetAlign(object_.align[idx], idx)
             object_offs_mult = 1
          else:
             self.SetAlign(l, idx)
             object_offs_mult = 0
 
-         self.offs_mm[idx] = object_offs_mult*object_.offs_mm[idx]+add_offs_mm[idx] + (defaultdict(lambda:0,{
+         self.offs_mm[idx] = object_offs_mult*object_.offs_mm[idx]+add_offs_mm[idx] + ({
                None: self.offs_mm[idx],
-               rel_locs[idx][1] : -self.Size_mm[idx],
-               rel_locs[idx][2] : object_.Size_mm[idx],
-               rel_locs[idx][3] : (object_.Size_mm[idx]-self.Size_mm[idx])/2,
-            })[l])
+               rel_locs[idx][0] : -self.Size_mm[idx],
+               rel_locs[idx][1] : object_.Size_mm[idx],
+               rel_locs[idx][2] : (object_.Size_mm[idx]-self.Size_mm[idx])/2,
+            }[l] if l not in ['mirror','sameas'] and not self.IsAlignValid(l, idx) else 0)
 
    ## It should scale all numeric attributes of figure object
    ## except offsets
