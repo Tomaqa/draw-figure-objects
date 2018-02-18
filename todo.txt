@@ -1,6 +1,0 @@
-* force_play neni vzdy napsane u varianty karty, ale jen pokud to neni primo u druhu karty
-* play with - lisi se u ruznych akci karty - asi to taky bude potreba az u konkretni varianty v popisu efektu
-
-* nefunguji CFigObject jako skupiny pro objekty zarovnane doprava s pozitivnim offsetem nebo s velkou sirkou - proste kdyz to presahuje ramec ostatnich objektu - mel by se aktualizovat xoffsm (resp. RelBegin) a Size
-* umoznit deep mirror - zrcadlit objekt vcetne jeho podobjektu
-* zmena poradi objektu po vlozeni (jen pro vykresleni)
